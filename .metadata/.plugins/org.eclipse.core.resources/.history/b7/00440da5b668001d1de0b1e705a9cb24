@@ -1,0 +1,345 @@
+package GUI;
+
+import javax.swing.JPanel;
+import java.awt.Color;
+import java.awt.FlowLayout;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+
+import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.rmi.Naming;
+import java.rmi.RemoteException;
+import java.util.List;
+
+import javax.swing.JComboBox;
+import javax.swing.JProgressBar;
+import javax.swing.JScrollPane;
+
+import java.awt.Choice;
+import com.toedter.calendar.JDateChooser;
+import com.toedter.calendar.JDayChooser;
+import com.toedter.components.JSpinField;
+
+import entity.CauHoiThi;
+import entity.DapAn;
+import entity.LoaiCauHoi;
+import entity.MonHoc;
+import entity.Thi;
+import service.ICauHoiThiService;
+import service.IDapAnService;
+import service.ILoaiCauHoiService;
+import service.IMonHocService;
+import service.IThiService;
+import view.util.RMIUrl;
+
+import com.toedter.calendar.JYearChooser;
+import com.toedter.calendar.JMonthChooser;
+import com.toedter.calendar.JCalendar;
+import com.toedter.components.JLocaleChooser;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.JButton;
+import javax.swing.JTable;
+
+public class GUI_TaoLichThi extends JPanel implements ActionListener,MouseListener{
+	private JTable table;
+	private DefaultTableModel model;
+	private JComboBox<String> cboCauHoiKho;
+	private JDateChooser dateChooserDongDe;
+	private JSpinner spinnerGioDongDe;
+	private JSpinner spinnerPhutDongDe;
+	private JButton btnTaoLich;
+	private JButton btnXoa;
+	private JButton btnSua;
+	private JButton btnLuu;
+	private JComboBox<String> cboMonHoc;
+	private JDateChooser dateChooserMoDe;
+	private JSpinner spinnerGioMoDe;
+	private JSpinner spinnerPhutMoDe;
+	private JSpinner spinnerPhutLamBai;
+	private String rmiUrl = new RMIUrl().RMIUrl();
+	private JSpinner spinnerSoCauHoi;
+	private IMonHocService monHocService;
+	private IThiService thiService;
+	private String maGV = null;
+	private List<Thi> listThi;
+	private boolean checkThem = false;
+	private boolean checkSua = false;
+	/**
+	 * Create the panel.
+	 * @throws RemoteException 
+	 */
+	public GUI_TaoLichThi(String maGV) throws RemoteException {
+		this.maGV = maGV;
+		
+		try {
+			
+			thiService = (IThiService) Naming.lookup("rmi://" + rmiUrl  + ":2910/iThi");
+			monHocService = (IMonHocService) Naming.lookup("rmi://" + rmiUrl  + ":2910/iMonHoc");
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+		
+		
+		setLayout(null);
+		setSize(1174, 612);
+		
+		JPanel panel = new JPanel();
+		panel.setBackground(new Color(204, 204, 153));
+		panel.setBounds(0, 0, 1174, 43);
+		add(panel);
+		panel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+		
+		JLabel lblToLchThi = new JLabel("Tạo Lịch Thi");
+		lblToLchThi.setForeground(new Color(153, 0, 0));
+		lblToLchThi.setFont(new Font("Dialog", Font.BOLD, 25));
+		panel.add(lblToLchThi);
+		
+		JPanel panel_1 = new JPanel();
+		panel_1.setBounds(0, 43, 1174, 559);
+		add(panel_1);
+		panel_1.setLayout(null);
+		
+		JLabel lblNewLabel = new JLabel("Chọn môn học");
+		lblNewLabel.setFont(new Font("Tahoma", Font.PLAIN, 17));
+		lblNewLabel.setBounds(85, 29, 127, 31);
+		panel_1.add(lblNewLabel);
+		
+		cboMonHoc = new JComboBox();
+		cboMonHoc.setBounds(241, 32, 501, 31);
+		panel_1.add(cboMonHoc);
+		
+		JLabel lblNewLabel_1 = new JLabel("Thời gian mở đề");
+		lblNewLabel_1.setFont(new Font("Tahoma", Font.PLAIN, 17));
+		lblNewLabel_1.setBounds(85, 71, 134, 31);
+		panel_1.add(lblNewLabel_1);
+		
+		JLabel lblNewLabel_1_1 = new JLabel("Thời gian làm bài");
+		lblNewLabel_1_1.setFont(new Font("Tahoma", Font.PLAIN, 17));
+		lblNewLabel_1_1.setBounds(85, 156, 145, 23);
+		panel_1.add(lblNewLabel_1_1);
+		
+		JLabel lblNewLabel_1_2 = new JLabel("Số câu hỏi");
+		lblNewLabel_1_2.setFont(new Font("Tahoma", Font.PLAIN, 17));
+		lblNewLabel_1_2.setBounds(381, 156, 87, 23);
+		panel_1.add(lblNewLabel_1_2);
+		
+		 dateChooserMoDe = new JDateChooser();
+		dateChooserMoDe.setBounds(241, 71, 276, 31);
+		panel_1.add(dateChooserMoDe);
+		
+		JLabel lblNewLabel_2 = new JLabel("giờ");
+		lblNewLabel_2.setFont(new Font("Tahoma", Font.PLAIN, 17));
+		lblNewLabel_2.setBounds(604, 76, 32, 23);
+		panel_1.add(lblNewLabel_2);
+		
+		JLabel lblNewLabel_3 = new JLabel("phút");
+		lblNewLabel_3.setFont(new Font("Tahoma", Font.PLAIN, 17));
+		lblNewLabel_3.setBounds(701, 75, 46, 25);
+		panel_1.add(lblNewLabel_3);
+		
+		spinnerGioMoDe = new JSpinner();
+		spinnerGioMoDe.setModel(new SpinnerNumberModel(0, 0, 23, 1));
+		spinnerGioMoDe.setBounds(549, 71, 45, 31);
+		panel_1.add(spinnerGioMoDe);
+		
+		 spinnerPhutMoDe = new JSpinner();
+		spinnerPhutMoDe.setModel(new SpinnerNumberModel(0, 0, 60, 15));
+		spinnerPhutMoDe.setBounds(646, 71, 45, 31);
+		panel_1.add(spinnerPhutMoDe);
+		
+		 spinnerPhutLamBai = new JSpinner();
+		spinnerPhutLamBai.setModel(new SpinnerNumberModel(0, 0, 120, 15));
+		spinnerPhutLamBai.setBounds(241, 155, 45, 31);
+		panel_1.add(spinnerPhutLamBai);
+		
+		JLabel lblNewLabel_3_1 = new JLabel("phút");
+		lblNewLabel_3_1.setFont(new Font("Tahoma", Font.PLAIN, 17));
+		lblNewLabel_3_1.setBounds(296, 155, 46, 25);
+		panel_1.add(lblNewLabel_3_1);
+		
+		 spinnerSoCauHoi = new JSpinner();
+		spinnerSoCauHoi.setModel(new SpinnerNumberModel(5, 5, 200, 5));
+		spinnerSoCauHoi.setBounds(478, 155, 45, 31);
+		panel_1.add(spinnerSoCauHoi);
+		
+		JLabel lblNewLabel_1_2_1 = new JLabel("Số lượng câu hỏi khó");
+		lblNewLabel_1_2_1.setFont(new Font("Tahoma", Font.PLAIN, 17));
+		lblNewLabel_1_2_1.setBounds(549, 156, 192, 23);
+		panel_1.add(lblNewLabel_1_2_1);
+		
+		 cboCauHoiKho = new JComboBox<String>();
+		cboCauHoiKho.setBounds(731, 155, 127, 31);
+		panel_1.add(cboCauHoiKho);
+		cboCauHoiKho.addItem("0%");
+		cboCauHoiKho.addItem("10%");
+		cboCauHoiKho.addItem("20%");
+		cboCauHoiKho.addItem("30%");
+		cboCauHoiKho.addItem("40%");
+		cboCauHoiKho.addItem("50%");
+		cboCauHoiKho.addItem("60%");
+		cboCauHoiKho.addItem("70%");
+		cboCauHoiKho.addItem("80%");
+		cboCauHoiKho.addItem("90%");
+		cboCauHoiKho.addItem("100%");
+		
+		JLabel lblNewLabel_1_3 = new JLabel("Thời gian đóng đề");
+		lblNewLabel_1_3.setFont(new Font("Tahoma", Font.PLAIN, 17));
+		lblNewLabel_1_3.setBounds(85, 113, 140, 31);
+		panel_1.add(lblNewLabel_1_3);
+		
+		 dateChooserDongDe = new JDateChooser();
+		dateChooserDongDe.setBounds(241, 113, 276, 31);
+		panel_1.add(dateChooserDongDe);
+		
+		 spinnerGioDongDe = new JSpinner();
+		spinnerGioDongDe.setBounds(549, 113, 45, 31);
+		panel_1.add(spinnerGioDongDe);
+		
+		JLabel lblNewLabel_2_1 = new JLabel("giờ");
+		lblNewLabel_2_1.setFont(new Font("Tahoma", Font.PLAIN, 17));
+		lblNewLabel_2_1.setBounds(604, 118, 32, 23);
+		panel_1.add(lblNewLabel_2_1);
+		
+		 spinnerPhutDongDe = new JSpinner();
+		spinnerPhutDongDe.setBounds(646, 113, 45, 31);
+		panel_1.add(spinnerPhutDongDe);
+		
+		JLabel lblNewLabel_3_2 = new JLabel("phút");
+		lblNewLabel_3_2.setFont(new Font("Tahoma", Font.PLAIN, 17));
+		lblNewLabel_3_2.setBounds(701, 117, 46, 25);
+		panel_1.add(lblNewLabel_3_2);
+		
+		 btnTaoLich = new JButton("Tạo");
+		btnTaoLich.setFont(new Font("Tahoma", Font.PLAIN, 17));
+		btnTaoLich.setBounds(85, 213, 145, 48);
+		panel_1.add(btnTaoLich);
+		
+		 btnXoa = new JButton("Xóa");
+		btnXoa.setFont(new Font("Tahoma", Font.PLAIN, 17));
+		btnXoa.setBounds(296, 213, 145, 48);
+		panel_1.add(btnXoa);
+		
+		 btnSua = new JButton("Sửa");
+		btnSua.setFont(new Font("Tahoma", Font.PLAIN, 17));
+		btnSua.setBounds(504, 213, 145, 48);
+		panel_1.add(btnSua);
+		
+		 btnLuu = new JButton("Lưu");
+		btnLuu.setFont(new Font("Tahoma", Font.PLAIN, 17));
+		btnLuu.setBounds(713, 213, 145, 48);
+		panel_1.add(btnLuu);
+		
+		String[] tb = new String[] { "STT" ,"Kỳ Thi", "Thời gian mở đề","Thời gian đóng đề","Thời gian làm bài","Số câu hỏi","Phần trăm câu hỏi khó"};
+		model= new DefaultTableModel(tb,0);
+		table = new JTable(model);
+		table.setBounds(85, 299, 1009, 249);
+		
+		JScrollPane jScrollPane = new JScrollPane(table);
+		jScrollPane.setBounds(85, 299, 1009, 249);
+		panel_1.add(jScrollPane);
+		
+		
+		table.addMouseListener(this);
+		LoadCboMH();
+	}
+	private void removeTable() {
+		DefaultTableModel dtm = (DefaultTableModel) table.getModel();
+		dtm.getDataVector().removeAllElements();
+
+	}
+	private void loadTable() throws RemoteException {
+		removeTable();
+		String maMH = cboMonHoc.getSelectedItem().toString().substring(0, 6);
+		listThi = thiService.GetAllLichThiTheoMon(maMH);
+		
+		int i = 1;
+		for(Thi t : listThi) {
+			model.addRow(new Object[] {
+				i,t.getTenKyThi(),t.getThoiGianMoDe(),t.getThoiGianDongDe(),t.getThoiGianLambai(),t.getSoCauHoi(),t.getPhanTramCauHoiKho()
+			});
+			i++;
+		}
+		
+		
+	}
+
+	private void LoadCboMH() throws RemoteException {
+		for(MonHoc mh : monHocService.getMonHocMaGiangVien(maGV)) {
+			cboMonHoc.addItem(mh.getMaMH() + " (" + mh.getTenMH() + ")");
+		}
+	}
+	
+	public void mouseClicked(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void mousePressed(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void mouseReleased(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void mouseEntered(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void mouseExited(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void actionPerformed(ActionEvent e) {
+		Object o = e.getSource();
+		if(o.equals(btnTaoLich)) {
+			if(!checkThem) {
+				checkThem = true;
+				btnTaoLich.setText("Hủy");
+				setEditText();
+				clearText();
+				btnLuu.setEnabled(true);
+				btnSua.setEnabled(false);
+				btnXoa.setEnabled(false);
+			}else {
+				checkThem = false;
+				btnTaoLich.setText("Tạo Lịch");
+				noEditText();
+				clearText();
+				btnLuu.setEnabled(false);
+				btnSua.setEnabled(true);
+				btnXoa.setEnabled(true);
+			}
+		}
+		if(o.equals(btnSua)) {}
+		if(o.equals(btnLuu)) {}
+		if(o.equals(btnXoa)) {
+			int row = table.getSelectedRow();
+			if(row == -1) {
+				JOptionPane.showMessageDialog(this, "Vui lòng chọn lịch thi muốn xóa!!!");
+				return;
+			} else {
+				
+			}
+		}
+		if(o.equals(cboMonHoc)) {
+			try {
+				loadTable();
+			} catch (RemoteException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}
+		
+	}
+}
